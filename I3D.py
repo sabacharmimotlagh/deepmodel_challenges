@@ -187,7 +187,7 @@ class InceptionI3d(nn.Module):
     )
 
     def __init__(self, num_classes=400, spatial_squeeze=True,
-                 final_endpoint='Logits', name='inception_i3d', in_channels=3, dropout_keep_prob=0.5):
+                 final_endpoint='Logits', name='inception_i3d', in_channels=3, dropout_keep_prob=0.5, activation_layer=''):
         """Initializes I3D model instance.
         Args:
           num_classes: The number of outputs in the logit layer (default 400, which
@@ -219,7 +219,11 @@ class InceptionI3d(nn.Module):
 
         self.end_points = {}
         end_point = 'Conv3d_1a_7x7'
-        self.end_points[end_point] = Unit3D(in_channels=in_channels, output_channels=64, kernel_shape=[7, 7, 7],
+        if activation_layer == end_point:
+            self.end_points[end_point] = Unit3D(in_channels=in_channels, output_channels=64, kernel_shape=[7, 7, 7],
+                                            stride=(2, 2, 2), padding=(3,3,3),  name=name+end_point, activation_fn=None)
+        else:
+            self.end_points[end_point] = Unit3D(in_channels=in_channels, output_channels=64, kernel_shape=[7, 7, 7],
                                             stride=(2, 2, 2), padding=(3,3,3),  name=name+end_point)
         if self._final_endpoint == end_point: return
         
@@ -229,12 +233,20 @@ class InceptionI3d(nn.Module):
         if self._final_endpoint == end_point: return
         
         end_point = 'Conv3d_2b_1x1'
-        self.end_points[end_point] = Unit3D(in_channels=64, output_channels=64, kernel_shape=[1, 1, 1], padding=0,
+        if activation_layer == end_point:
+            self.end_points[end_point] = Unit3D(in_channels=64, output_channels=64, kernel_shape=[1, 1, 1], padding=0,
+                                       name=name+end_point, activation_fn=None)
+        else:
+            self.end_points[end_point] = Unit3D(in_channels=64, output_channels=64, kernel_shape=[1, 1, 1], padding=0,
                                        name=name+end_point)
         if self._final_endpoint == end_point: return
         
         end_point = 'Conv3d_2c_3x3'
-        self.end_points[end_point] = Unit3D(in_channels=64, output_channels=192, kernel_shape=[3, 3, 3], padding=1,
+        if activation_layer == end_point:
+            self.end_points[end_point] = Unit3D(in_channels=64, output_channels=192, kernel_shape=[3, 3, 3], padding=1,
+                                       name=name+end_point, activation_fn=None)
+        else:
+            self.end_points[end_point] = Unit3D(in_channels=64, output_channels=192, kernel_shape=[3, 3, 3], padding=1,
                                        name=name+end_point)
         if self._final_endpoint == end_point: return
 
@@ -244,11 +256,17 @@ class InceptionI3d(nn.Module):
         if self._final_endpoint == end_point: return
         
         end_point = 'Mixed_3b'
-        self.end_points[end_point] = InceptionModule(192, [64,96,128,16,32,32], name+end_point)
+        if activation_layer == end_point:
+            self.end_points[end_point] = InceptionModule(192, [64,96,128,16,32,32], name+end_point,activation_fn=None)
+        else:
+            self.end_points[end_point] = InceptionModule(192, [64,96,128,16,32,32], name+end_point)
         if self._final_endpoint == end_point: return
 
         end_point = 'Mixed_3c'
-        self.end_points[end_point] = InceptionModule(256, [128,128,192,32,96,64], name+end_point)
+        if activation_layer == end_point:
+            self.end_points[end_point] = InceptionModule(256, [128,128,192,32,96,64], name+end_point, activation_fn=None)
+        else:
+            self.end_points[end_point] = InceptionModule(256, [128,128,192,32,96,64], name+end_point)
         if self._final_endpoint == end_point: return
 
         end_point = 'MaxPool3d_4a_3x3'
@@ -257,23 +275,38 @@ class InceptionI3d(nn.Module):
         if self._final_endpoint == end_point: return
 
         end_point = 'Mixed_4b'
-        self.end_points[end_point] = InceptionModule(128+192+96+64, [192,96,208,16,48,64], name+end_point)
+        if activation_layer == end_point:
+            self.end_points[end_point] = InceptionModule(128+192+96+64, [192,96,208,16,48,64], name+end_point, activation_fn=None)
+        else:
+            self.end_points[end_point] = InceptionModule(128+192+96+64, [192,96,208,16,48,64], name+end_point)
         if self._final_endpoint == end_point: return
 
         end_point = 'Mixed_4c'
-        self.end_points[end_point] = InceptionModule(192+208+48+64, [160,112,224,24,64,64], name+end_point)
+        if activation_layer == end_point:
+            self.end_points[end_point] = InceptionModule(192+208+48+64, [160,112,224,24,64,64], name+end_point, activation_fn=None)
+        else:
+            self.end_points[end_point] = InceptionModule(192+208+48+64, [160,112,224,24,64,64], name+end_point)
         if self._final_endpoint == end_point: return
 
         end_point = 'Mixed_4d'
-        self.end_points[end_point] = InceptionModule(160+224+64+64, [128,128,256,24,64,64], name+end_point)
+        if activation_layer == end_point:
+            self.end_points[end_point] = InceptionModule(160+224+64+64, [128,128,256,24,64,64], name+end_point, activation_fn=None)
+        else:
+            self.end_points[end_point] = InceptionModule(160+224+64+64, [128,128,256,24,64,64], name+end_point)
         if self._final_endpoint == end_point: return
 
         end_point = 'Mixed_4e'
-        self.end_points[end_point] = InceptionModule(128+256+64+64, [112,144,288,32,64,64], name+end_point)
+        if activation_layer == end_point:
+            self.end_points[end_point] = InceptionModule(128+256+64+64, [112,144,288,32,64,64], name+end_point, activation_fn=None)
+        else:
+            self.end_points[end_point] = InceptionModule(128+256+64+64, [112,144,288,32,64,64], name+end_point)
         if self._final_endpoint == end_point: return
 
         end_point = 'Mixed_4f'
-        self.end_points[end_point] = InceptionModule(112+288+64+64, [256,160,320,32,128,128], name+end_point)
+        if activation_layer == end_point:
+            self.end_points[end_point] = InceptionModule(112+288+64+64, [256,160,320,32,128,128], name+end_point, activation_fn=None)
+        else:
+            self.end_points[end_point] = InceptionModule(112+288+64+64, [256,160,320,32,128,128], name+end_point)
         if self._final_endpoint == end_point: return
 
         end_point = 'MaxPool3d_5a_2x2'
@@ -282,11 +315,17 @@ class InceptionI3d(nn.Module):
         if self._final_endpoint == end_point: return
 
         end_point = 'Mixed_5b'
-        self.end_points[end_point] = InceptionModule(256+320+128+128, [256,160,320,32,128,128], name+end_point)
+        if activation_layer == end_point:
+            self.end_points[end_point] = InceptionModule(256+320+128+128, [256,160,320,32,128,128], name+end_point, activation_fn=None)
+        else:
+            self.end_points[end_point] = InceptionModule(256+320+128+128, [256,160,320,32,128,128], name+end_point)
         if self._final_endpoint == end_point: return
 
         end_point = 'Mixed_5c'
-        self.end_points[end_point] = InceptionModule(256+320+128+128, [384,192,384,48,128,128], name+end_point, activation_fn=None)
+        if activation_layer == end_point:
+            self.end_points[end_point] = InceptionModule(256+320+128+128, [384,192,384,48,128,128], name+end_point, activation_fn=None)
+        else:
+            self.end_points[end_point] = InceptionModule(256+320+128+128, [384,192,384,48,128,128], name+end_point)
         if self._final_endpoint == end_point: return
 
         end_point = 'Logits'
