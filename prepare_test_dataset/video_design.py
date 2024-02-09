@@ -13,7 +13,7 @@ def video_design(speed, image_dir, save_dir, all_target=False):
     masks = list(range(41, 81))
 
     # Form the matrix for all stimuli
-    F = np.zeros((40, 11 * speed), dtype=np.uint8)
+    F = np.zeros((40, 11*speed), dtype=np.uint8)
 
     if all_target:
         F[i, :] = np.repeat(stimuli[i], 11*speed)
