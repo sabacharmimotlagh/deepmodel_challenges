@@ -129,6 +129,7 @@ def run(filename, mode, root, save_dir=''):
         rgb_frames = extract_rgb_frames(root)
         # save rgb frames in save_dir directory
         np.save(os.path.join(save_dir, name+'_rgb'), rgb_frames)
+        print('Successfully extracted rgb frames ...')
 
 
     # if you want flow features
@@ -138,8 +139,8 @@ def run(filename, mode, root, save_dir=''):
         flow_frames = extract_flow_frames(root)
         # save flow tensor in save_dir directory
         np.save(os.path.join(save_dir, name+'_flow'), flow_frames)
+        print('Successfully extracted flow frames ...')
 
 
-
-
+# run the code to extract frames
 run(filename=args.filename, mode=args.mode, root=args.root, save_dir=args.save_dir)
