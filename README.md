@@ -7,6 +7,6 @@ The I3D model used here (and its checkpoints) is inspired by [this repository](h
 [RSVPGenerator.py](RSVPGenerator.py) will create an object which will generate RSVP videos by constructing masks from stimuli and putting stimuli and masks in a rapid presentation.
 
 
-[![]()](1.mp4)
+[![](1.mp4)](1.mp4)
 
 [extract_frames.py](extract_frames.py) will extract rgb and optical flow (using TV-L1 algorithm) frames.
