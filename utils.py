@@ -1,7 +1,5 @@
 import numpy as np
 
-
-
 def normalize_rdm(RDM, exclude_diag=True):
     """
     Normalize a dissimilarity matrix (RDM) by calculating the z-score for each element.

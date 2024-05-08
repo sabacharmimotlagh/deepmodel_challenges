@@ -4,9 +4,6 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 import numpy as np
-
-import os
-import sys
 from collections import OrderedDict
 
 

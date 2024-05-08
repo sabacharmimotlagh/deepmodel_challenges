@@ -13,13 +13,13 @@ parser.add_argument('--save_dir', type=str)
 args = parser.parse_args()
 
 
-def get_activation(name):
-    activation = {}
-    def hook(model, input, output):
-        activation[name] = output.detach()
-    return hook
 
 def extract_rgb_activation(path, save_dir, activation_layer):
+
+    def get_activation(name):
+        def hook(model, input, output):
+            activation[name] = output.detach()
+        return hook
 
     # load the video frames
     enteries = os.listdir(path)
@@ -31,7 +31,7 @@ def extract_rgb_activation(path, save_dir, activation_layer):
 
     i3d._modules.get(activation_layer).register_forward_hook(get_activation(activation_layer))
 
-    rgb_activations = np.array([])
+    rgb_activations = []
 
     for filename in enteries:
         if filename.endswith('_rgb.npy'):
@@ -50,13 +50,18 @@ def extract_rgb_activation(path, save_dir, activation_layer):
             with torch.no_grad():
                 rgb_pred = i3d(rgb_tensor)
 
-        rgb_activations[num_of_video-1, :, :, :, :] = activation[activation_layer].numpy()
+        rgb_activations.append(activation[activation_layer].numpy())
 
 
-    np.save(os.path.join(save_dir, 'rgb_activation_', activation_layer), rgb_activations)
+    np.save(os.path.join(save_dir, f'rgb_activation_{activation_layer}'), rgb_activations)
 
 
 def extract_flow_activation(path, save_dir, activation_layer):
+
+    def get_activation(name):
+        def hook(model, input, output):
+            activation[name] = output.detach()
+        return hook
 
     # load the video frames
     enteries = os.listdir(path)
@@ -64,11 +69,11 @@ def extract_flow_activation(path, save_dir, activation_layer):
     # setup the model for flow prediction
     i3d = InceptionI3d(400, in_channels=2, activation_layer=activation_layer)
     i3d.replace_logits(157)
-    i3d.load_state_dict(torch.load('./checkpoints/flow_charades.pt'))
+    i3d.load_state_dict(torch.load('./checkpoints/flow_charades.pt', map_location=torch.device('cpu')))
 
     i3d._modules.get(activation_layer).register_forward_hook(get_activation(activation_layer))
 
-    flow_activations = np.array([])
+    flow_activations = []
 
     for filename in enteries:
         if filename.endswith('_flow.npy'):
@@ -87,8 +92,17 @@ def extract_flow_activation(path, save_dir, activation_layer):
             with torch.no_grad():
                 flow_pred = i3d(flow_tensor)
 
-            flow_activations[num_of_video-1, :, :, :, :] = activation[activation_layer].numpy()
+            flow_activations.append(activation[activation_layer].numpy())
 
 
-    np.save(os.path.join(save_dir, 'flow_activation_', activation_layer), flow_activations)
+    np.save(os.path.join(save_dir, f'flow_activation_{activation_layer}'), flow_activations)
 
+
+def run():
+    if args.mode == 'rgb':
+        extract_rgb_activation(args.root, args.save_dir, args.activation_layer)
+    elif args.mode == 'flow':
+        extract_flow_activation(args.root, args.save_dir, args.activation_layer)
+
+# run the code
+run()
