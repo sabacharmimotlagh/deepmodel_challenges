@@ -8,7 +8,7 @@ The I3D model used here (and its checkpoints) is inspired by [this repository](h
 
 Here is a much slower example of the generated videos:
 
-<img src='./assests/1.gif' width='500' height='500'>
+<img src='./assets/1.gif' width='500' height='500'>
 
 <br />
 
